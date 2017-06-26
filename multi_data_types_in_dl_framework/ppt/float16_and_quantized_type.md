@@ -10,7 +10,7 @@
 
 <!-- page_number: true -->
 
-# Part I：float16 - FP16, half
+# Part I, float16 - FP16, half
 
 ---
 
@@ -34,7 +34,7 @@
 
 ---
 
-# <small>类型定义 & 类型转换</small>
+# <small>基本类型支持</small>
 - <small>caffe2 
   - <small>类型定义[caffe2/caffe2/core/types.h](https://github.com/caffe2/caffe2/blob/master/caffe2/core/types.h#L53)
     ```cpp
@@ -66,13 +66,16 @@
     ```
   </small></small>
 
+[comment]: <> (基本类型支持包括：类型定义，类型转换，计算函数。)
+[comment]: <> (由于通用CPU硬件不支持half类型，因此CPU上的支持都采用软件模拟的方式，计算也都是通过转换成float操作的，因此效率会比较低下。)
 [comment]: <> (总体方法是，使用位操作和移位操作，分别求出符号位、指数、尾数，然后将指数、尾数规范到范围内)
 [comment]: <> (对一些特殊值，比如nan、inf等，有特殊的处理)
 
 --- 
 
-# <small>类型定义 & 类型转换</small>
+# <small>基本类型支持</small>
 - <small>CUDA [include/cuda_fp16.h](https://github.com/ptillet/isaac/blob/master/include/external/cuda/cuda_fp16.h)
+  - CUDA 7.5后 [文档](http://docs.nvidia.com/cuda/cuda-math-api/group__CUDA__MATH__INTRINSIC__HALF.html#group__CUDA__MATH__INTRINSIC__HALF)
   - 类型定义
     ```
     typedef struct __align__(2) {
@@ -82,13 +85,23 @@
       unsigned int x;
     } __half2;
     ```
-  - 类型转换函数
+  - 转换函数
+    ```
+    __device__ __half __float2half(const float a);
+    __device__ float __half2float(const __half a);
+    __device__ __half2 __floats2half2_rn(const float a, const float b);
+    __device__ float2 __half22float2(const __half2 a);
+    ```
   - 计算函数
+    ```
+    __device__ __half __hadd(const __half a, const __half b);
+    __device__ __half2 __hadd2(const __half2 a, const __half2 b);
+    ```
   </small>
 
 ---
 
-# <small>类型定义 & 类型转换</small>
+# <small>基本类型支持</small>
 - <small>majel： include/majel_lite/float16.h
 - Eigen： [Eigen/src/Core/arch/CUDA/Half.h](https://bitbucket.org/eigen/eigen/src/dbab66d00651bf050d1426334a39b627abe7216e/Eigen/src/Core/arch/CUDA/Half.h?at=default&fileviewer=file-view-default#Half.h-76) 
   - 封装了基本的+,-,*,/等运算符
@@ -118,16 +131,13 @@
 
 ---
 
-# 软件实现
-- half
-- majel
-- eigen
+# 深度学习中的应用
 - caffe2
 - tensorflow
 
 ---
 
-# Quantized int8 - Fixed point
+# PartII, Quantized int8 - Fixed point
 
 ---
 
