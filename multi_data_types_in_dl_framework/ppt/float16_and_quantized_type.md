@@ -124,27 +124,28 @@
 
 # <small>half为什么比float快？</small>
 - <small>硬件支持-NVIDIA GPU
-  - `half2`类型，两路向量半精度融合乘加指令(`HFMA2`) `a * b + c`
-    `__device__ __half2 __hfma2(const __half2 a, const __half2 b, const __half2 c)`
-  - 一条指令操作两个`half`数据
+  - `half2`类型，两路向量半精度融合乘加指令(`HFMA2`)，一条指令操作两个`half`数据
+    ```cpp
+    __device__ __half2 __hfma2(const __half2 a, const __half2 b, const __half2 c); // a * b + c
+    ````
   - [使用示例](https://github.com/parallel-forall/code-samples/blob/master/posts/mixed-precision/haxpy.cu#L50)
-  ```cpp
-  __global__ void haxpy(int n, half a, const half *x, half *y) {
-    int start = threadIdx.x + blockDim.x * blockIdx.x;
-    int stride = blockDim.x * gridDim.x;
-  #if __CUDA_ARCH__ >= 530
-    int n2 = n/2;
-    half2 *x2 = (half2*)x, *y2 = (half2*)y;
-    for (int i = start; i < n2; i+= stride) 
-      y2[i] = __hfma2(__halves2half2(a, a), x2[i], y2[i]);
-    // first thread handles singleton for odd arrays
-    if (start == 0 && (n%2)) y[n-1] = __hfma(a, x[n-1], y[n-1]);   
-  #else
-    for (int i = start; i < n; i+= stride)
-      y[i] = __float2half(__half2float(a) * __half2float(x[i]) + __half2float(y[i]));
-  #endif
-  }
-  ```
+    ```cpp
+    __global__ void haxpy(int n, half a, const half *x, half *y) {
+      int start = threadIdx.x + blockDim.x * blockIdx.x;
+      int stride = blockDim.x * gridDim.x;
+    #if __CUDA_ARCH__ >= 530
+      int n2 = n/2;
+      half2 *x2 = (half2*)x, *y2 = (half2*)y;
+      for (int i = start; i < n2; i+= stride) 
+        y2[i] = __hfma2(__halves2half2(a, a), x2[i], y2[i]);
+      // first thread handles singleton for odd arrays
+      if (start == 0 && (n%2)) y[n-1] = __hfma(a, x[n-1], y[n-1]);   
+    #else
+      for (int i = start; i < n; i+= stride)
+        y[i] = __float2half(__half2float(a) * __half2float(x[i]) + __half2float(y[i]));
+    #endif
+    }
+    ```
   - **Eigen内部会自动使用`half2`类型计算** [Eigen/src/Core/arch/CUDA/PacketMathHalf.h](https://bitbucket.org/eigen/eigen/src/dbab66d00651bf050d1426334a39b627abe7216e/Eigen/src/Core/arch/CUDA/PacketMathHalf.h?at=default&fileviewer=file-view-default)
   </small>
 
