@@ -77,7 +77,7 @@
 - <small>CUDA [include/cuda_fp16.h](https://github.com/ptillet/isaac/blob/master/include/external/cuda/cuda_fp16.h)
   - CUDA 7.5后 [文档](http://docs.nvidia.com/cuda/cuda-math-api/group__CUDA__MATH__INTRINSIC__HALF.html#group__CUDA__MATH__INTRINSIC__HALF)
   - 类型定义
-    ```
+    ```cpp
     typedef struct __align__(2) {
       unsigned short x;
     } __half;
@@ -86,14 +86,14 @@
     } __half2;
     ```
   - 转换函数
-    ```
+    ```cpp
     __device__ __half __float2half(const float a);
     __device__ float __half2float(const __half a);
     __device__ __half2 __floats2half2_rn(const float a, const float b);
     __device__ float2 __half22float2(const __half2 a);
     ```
   - 计算函数
-    ```
+    ```cpp
     __device__ __half __hadd(const __half a, const __half b);
     __device__ __half2 __hadd2(const __half2 a, const __half2 b);
     ```
@@ -128,7 +128,7 @@
   `__device__ __half2 __hfma2(const __half2 a, const __half2 b, const __half2 c)`
   - 一条指令操作两个`half`数据
   - [使用示例](https://github.com/parallel-forall/code-samples/blob/master/posts/mixed-precision/haxpy.cu#L50)
-  ```
+  ```cpp
   __global__ void haxpy(int n, half a, const half *x, half *y) {
     int start = threadIdx.x + blockDim.x * blockIdx.x;
     int stride = blockDim.x * gridDim.x;
