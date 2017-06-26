@@ -234,19 +234,66 @@
 
 ---
 
-# Fixed-point
-- 原始的方法
-- google的方法
+# <small>基本类型支持</small>
+- tensorflow
+  - 类型定义 [third_party/eigen3/unsupported/Eigen/CXX11/src/FixedPoint/FixedPointTypes.h](https://github.com/tensorflow/tensorflow/blob/master/third_party/eigen3/unsupported/Eigen/CXX11/src/FixedPoint/FixedPointTypes.h)
+    - `QInt8`, `QUInt8`, `QInt16`, `QUInt16`, `QInt32`
+    ```cpp
+    struct QInt8 {
+      QInt8() {}
+      QInt8(const int8_t v) : value(v) {}
+      QInt8(const QInt32 v);
+
+      operator int() const { return static_cast<int>(value); }
+
+      int8_t value;
+    };
+    ```
+    - 和Tensor数据类型DataType一一对应 [tensorflow/core/framework/types.proto](https://github.com/tensorflow/tensorflow/blob/master/tensorflow/core/framework/types.proto#L27)
+    - 重载这5种类型之间的基本运算符operator
+      - 都是转换成int32_t来计算
+
+[comment]: <> (定义QInt8这样一种类型的目的，是为了和int8数据区分开来)
+[comment]: <> (不能直接static_cast到int8，精度损失太多)
+[comment]: <> (单个元素考虑转换方法，矩阵计算没法加速)
+[comment]: <> (从计算的角度、从矩阵的层面考虑定点化的方法)
+---
+
+# <small>基本类型支持</small>
+- 类型转换方法一
+  - 对于 $Y = W * X$
+  - 若 $\tilde{W} = scale\_W * W$，且 $\tilde{X} = scale\_X * X$
+  - 那么 $Y = \tilde{W} * \tilde{X} / (scale\_W * scale\_X)$
+  - 取 $scale\_W = 128 / max(|W_{ij}|)$，那么 $-127 < \tilde{W}_{ij} < 128$
+- 类型转换方法二
+  ![60%](images/fixed_point_2.jpg)
+  - 令 $\tilde{Y}=\tilde{W} * \tilde{X}$，则 $Y_{ij}=\tilde{Y} / {scale\_W_i * scale\_X_j}$
+
+[comment]: <> (首先，简单介绍一下我以前实现过的一种方法)
 
 ---
 
-# INT8计算
+# 基本类型支持
+- 类型转换方法-Google
+
+---
+
+# 为什么更快？
 - 硬件支持-NVIDIA GPU
-	- 指令，intrinsic
-	- 计算库，cublas，cudnn
-- 硬件支持-ARM CPU
-	- 指令，intrinsic
-	- 计算库，gemmlowp (google)
+  - 计算库，cublas，cudnn
+
+---
+
+# 为什么更快？
+- 硬件支持-armv7a CPU
+  - 指令，intrinsic
+  - 计算库，gemmlowp (google)
+
+---
+
+# 深度学习系统中的应用
+- tensorflow
+
 
 ---
 <!-- prerender: true -->
