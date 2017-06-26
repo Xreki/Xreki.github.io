@@ -1,10 +1,10 @@
 
 <!-- $size: 16:9 -->
 
-# Float16 and Quantized Int8 Type 
+# <center>Float16 and Quantized Int8 Type 
 
-### Yiqun Liu
-###### 2017-06-27
+## <center>Yiqun Liu
+##### <center>2017-06-27
 
 ---
 
@@ -85,7 +85,7 @@
       unsigned int x;
     } __half2;
     ```
-  - 转换函数
+  - 类型转换
     ```cpp
     __device__ __half __float2half(const float a);
     __device__ float __half2float(const __half a);
@@ -171,7 +171,56 @@
 ---
 
 # <small>深度学习系统中的应用</small>
-- caffe2
+- <small>caffe2
+  - <small>`if`分支控制不同数据类型的计算 [caffe2/operators/fully_connected_op_gpu.cc](https://github.com/caffe2/caffe2/blob/master/caffe2/operators/fully_connected_op_gpu.cc)
+    ```cpp
+    template <> bool FullyConnectedOp<CUDAContext>::RunOnDevice() {
+      if (Input(0).IsType<float>()) {
+        return DoRunWithType<
+          float, // X
+          float, // W
+          float, // B
+          float, // Y
+          float>(); // Math
+      } else if (Input(0).IsType<float16>()) {
+        return DoRunWithType<
+          float16, // X
+          float16, // W
+          float16, // B
+          float16, // Y
+          float>(); // Math
+      } else {
+        CAFFE_THROW("Unsupported type");
+      }
+      return false;
+    }
+    ```
+  - 只有部分Op支持float16</small>
+    - <small>FullyConnectedOp, CudnnConvOp, CudnnSpatialBNOp, CuDNNPoolOp, CuDNNReluOp, CuDNNDropoutOp, MaxPoolWithIndexOp, WeightdSumOp, SumOp, CUDAAddOp</small>
+  </small>
+
+[comment]: <> (caffe2：只有一部分op支持float16)
+[comment]: <> (caffe2：由于Op模板参数里面没有DataType，以if语句控制不同数据类型的计算)
+
+---
+
+# <small>深度学习系统中的应用</small>
+- <small>caffe2
+  - CastOp [caffe2/operators/cast_op.cu](https://github.com/caffe2/caffe2/blob/master/caffe2/operators/cast_op.cu)
+  ![90%](images/cast_op.jpg)
+  - 两个疑问：
+    - Cast操作是否需要作为一个Op？每个Op自动检查数据类型并自动转换数据类型是否会更好？
+    - CastOp由用户显式配置、还是由Net自动添加？
+  </small>
+
+[comment]: <> (既然相邻的Op可能使用不同的数据类型，那么caffe2是怎么控制混合精度计算的呢？答案是通过引入CastOp)
+[comment]: <> (除了float16转换需求外，CastOp最常见的一个场景是图像，直接提供的是uint8数据，可通过CastOp转换成FLOAT数据)
+[comment]: <> (需要手动配置CastOp)
+[comment]: <> (CPU版的CastOp不支持float16的互转)
+
+---
+
+# <small>深度学习系统中的应用</small>
 - tensorflow
 
 ---
