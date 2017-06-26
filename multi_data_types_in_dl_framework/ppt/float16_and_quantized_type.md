@@ -158,7 +158,7 @@
     - `cublasSgemmEx`，使用FP32计算，输入数据可以是FP32、FP16或INT8，输出数据可以是FP32或FP16
   - cuDNN
     - 5.0支持FP16卷积前向计算，5.1支持FP16卷积后向计算
-  - 其他支持FP16 gemm的计算库：nervana，openai
+  - 其他支持FP16 gemm的计算库：[nervanagpu](https://github.com/NervanaSystems/nervanagpu)，[openai-gemm](https://github.com/openai/openai-gemm)
 
 ---
 
@@ -200,28 +200,33 @@
   </small>
 
 [comment]: <> (caffe2：只有一部分op支持float16)
-[comment]: <> (caffe2：由于Op模板参数里面没有DataType，以if语句控制不同数据类型的计算)
+[comment]: <> (caffe2：由于Op与数据类型DataType无关，以if语句控制不同数据类型的计算)
 
 ---
 
 # <small>深度学习系统中的应用</small>
 - <small>caffe2
-  - CastOp [caffe2/operators/cast_op.cu](https://github.com/caffe2/caffe2/blob/master/caffe2/operators/cast_op.cu)
-  ![90%](images/cast_op.jpg)
-  - 两个疑问：
-    - Cast操作是否需要作为一个Op？每个Op自动检查数据类型并自动转换数据类型是否会更好？
-    - CastOp由用户显式配置、还是由Net自动添加？
+  - CastOp
+    - [caffe2/operators/cast_op.cc](https://github.com/caffe2/caffe2/blob/master/caffe2/operators/cast_op.cc)   
+    - [caffe2/operators/cast_op.cu](https://github.com/caffe2/caffe2/blob/master/caffe2/operators/cast_op.cu)
+  ![80%](images/cast_op.jpg)
+    - [caffe2/experiments/python/convnet_benchmark.py](https://github.com/caffe2/caffe2/blob/master/caffe2/experiments/python/convnet_benchmarks.py#L520)
+      ```python
+      data_uint8, label = model.TensorProtosDBInput(
+          [], ["data_uint8", "label"], batch_size=batch_size,
+          db=db, db_type=db_type
+      )
+      data = model.Cast(data_uint8, "data_nhwc", to=core.DataType.FLOAT)
+      ```
   </small>
 
 [comment]: <> (既然相邻的Op可能使用不同的数据类型，那么caffe2是怎么控制混合精度计算的呢？答案是通过引入CastOp)
 [comment]: <> (除了float16转换需求外，CastOp最常见的一个场景是图像，直接提供的是uint8数据，可通过CastOp转换成FLOAT数据)
 [comment]: <> (需要手动配置CastOp)
 [comment]: <> (CPU版的CastOp不支持float16的互转)
-
----
-
-# <small>深度学习系统中的应用</small>
-- tensorflow
+[comment]: <> (两个疑问：)
+[comment]: <> (1. Cast操作是否需要作为一个Op？每个Op自动检查数据类型并自动转换数据类型是否会更好？)
+[comment]: <> (2. CastOp由用户显式配置、还是由Net自动添加？)
 
 ---
 
@@ -242,8 +247,7 @@
 - 硬件支持-ARM CPU
 	- 指令，intrinsic
 	- 计算库，gemmlowp (google)
-- 
 
 ---
 <!-- prerender: true -->
-# Thank You!
+# <center><big><big>Thank You!</big></big>
