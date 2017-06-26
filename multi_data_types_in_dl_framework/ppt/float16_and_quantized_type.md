@@ -3,7 +3,8 @@
 
 # Float16 and Quantized Int8 Type 
 
-##### Yiqun Liu
+### Yiqun Liu
+###### 2017-06-27
 
 ---
 
