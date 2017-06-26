@@ -145,7 +145,7 @@
   #endif
   }
   ```
-  - **Eigen内部会自动使用`half2`类型计算**
+  - **Eigen内部会自动使用`half2`类型计算** [Eigen/src/Core/arch/CUDA/PacketMathHalf.h](https://bitbucket.org/eigen/eigen/src/dbab66d00651bf050d1426334a39b627abe7216e/Eigen/src/Core/arch/CUDA/PacketMathHalf.h?at=default&fileviewer=file-view-default)
   </small>
 
 ---
