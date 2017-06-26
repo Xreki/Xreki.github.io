@@ -125,7 +125,7 @@
 # <small>half为什么比float快？</small>
 - <small>硬件支持-NVIDIA GPU
   - `half2`类型，两路向量半精度融合乘加指令(`HFMA2`) `a * b + c`
-  `__device__ __half2 __hfma2(const __half2 a, const __half2 b, const __half2 c)`
+    `__device__ __half2 __hfma2(const __half2 a, const __half2 b, const __half2 c)`
   - 一条指令操作两个`half`数据
   - [使用示例](https://github.com/parallel-forall/code-samples/blob/master/posts/mixed-precision/haxpy.cu#L50)
   ```cpp
@@ -145,6 +145,7 @@
   #endif
   }
   ```
+  - **Eigen内部会自动使用`half2`类型计算**
   </small>
 
 ---
@@ -161,12 +162,14 @@
 ---
 
 # <small>half为什么比float快？</small>
-- 硬件支持-ARMV8 CPU
-  - 指令，intrinsic
+- 硬件支持-armv8 CPU
+  - 基本数据类型`float16_t`
+  - 向量数据类型`float16x8_t`
+  - 函数支持
 
 ---
 
-# 深度学习中的应用
+# <small>深度学习系统中的应用</small>
 - caffe2
 - tensorflow
 
