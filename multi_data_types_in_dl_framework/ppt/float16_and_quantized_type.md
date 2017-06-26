@@ -71,24 +71,40 @@
 --- 
 
 # <small>类型定义 & 类型转换</small>
-- CUDA
+- <small>CUDA [include/cuda_fp16.h](https://github.com/ptillet/isaac/blob/master/include/external/cuda/cuda_fp16.h)
+  - 类型定义
+    ```
+    typedef struct __align__(2) {
+      unsigned short x;
+    } __half;
+    typedef struct __align__(4) {
+      unsigned int x;
+    } __half2;
+    ```
+  - 类型转换函数
+  - 计算函数
+  </small>
 
 ---
 
 # <small>类型定义 & 类型转换</small>
-- majel： include/majel_lite/float16.h
+- <small>majel： include/majel_lite/float16.h
 - Eigen： [Eigen/src/Core/arch/CUDA/Half.h](https://bitbucket.org/eigen/eigen/src/dbab66d00651bf050d1426334a39b627abe7216e/Eigen/src/Core/arch/CUDA/Half.h?at=default&fileviewer=file-view-default#Half.h-76) 
   - 封装了基本的+,-,*,/等运算符
   - CPU上转换成float计算，GPU上调用CUDA提供的intrinsic计算
 - Half-precision floating point library [http://half.sourceforge.net/](http://half.sourceforge.net/)
   - [half定义](https://github.com/headupinclouds/half/blob/master/include/half.hpp#L915)
+  - 数值特性支持的最完整
   - 优化的[half2float_impl](https://github.com/headupinclouds/half/blob/master/include/half.hpp#L610), [float2half_impl](https://github.com/headupinclouds/half/blob/master/include/half.hpp#L420)实现
   - 计算的优化，比如fmax、fmin
+- [类型转换的其他实现](https://gist.github.com/rygorous/2156668)
+  </small>
 
 [comment]: <> (Eigen比较详细，定义了各种数据类型之间的转换，以及运算符，CPU上转换成float来操作，GPU上调用intrinsic)
 [comment]: <> (Half库，CPU功能支持的比较完善，并且做了充分的优化：)
 [comment]: <> (1. half2float_impl/float2half_impl，以空间换时间，列举出2018个尾数，通过查表来转换)
 [comment]: <> (2. 一些运算操作，比如fmax、fmin，根据half的组成特征，分情况使用位操作和比较操作完成，而不是转换成float来比较)
+[comment]: <> (其他实现里面，包括了不同的rounding舍入方法，不同的快速实现版本，包括simd实现，但我认为应该比Half查表的方式慢)
 
 --- 
 
