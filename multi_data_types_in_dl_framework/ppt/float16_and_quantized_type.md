@@ -158,6 +158,8 @@
     - `cublasSgemmEx`，使用FP32计算，输入数据可以是FP32、FP16或INT8，输出数据可以是FP32或FP16
   - cuDNN
     - 5.0支持FP16卷积前向计算，5.1支持FP16卷积后向计算
+  - TensorRT
+    - v1有FP16 inference卷积支持
   - 其他支持FP16 gemm的计算库：[nervanagpu](https://github.com/NervanaSystems/nervanagpu)，[openai-gemm](https://github.com/openai/openai-gemm)
 
 ---
@@ -283,25 +285,57 @@
     $$ V = \tilde{V}*Q^{-1} + V_{min}$$
   - 作用于$Y=W*X$，可得
   $$ Y=\tilde{W}*\tilde{X}*Q_W^{-1}*Q_X^{-1} + \tilde{W}*Q_W^{-1}*X_{min} + \tilde{X}*Q_X^{-1}*W_{min}+W_{min}*X_{min}$$
-  
----
-
-# 为什么更快？
-- 硬件支持-NVIDIA GPU
-  - 计算库，cublas，cudnn
 
 ---
 
-# 为什么更快？
+# <small>为什么更快？</small>
+- 硬件支持-NVIDIA GPU include/sm_61_intrinsics.h
+  ![70%](images/dp4a.jpg)
+  - 计算函数
+  ```cpp
+  __device__ int __dp4a(int srcA, int srcB, int c);
+  __device__ int __dp4a(char4 srcA, char4 srcB, int c);
+  ```
+
+---
+
+# <small>为什么更快？</small>
+- cuBLAS
+  - CUDA 8.0引入新接口，cublasGemm，支持INT8计算
+- cuDNN
+  - v6增加INT8 inference支持
+- TensorRT
+  - v2将会增加INT8 inference支持
+
+---
+
+# <small>为什么更快？</small>
 - 硬件支持-armv7a CPU
-  - 指令，intrinsic
-  - 计算库，gemmlowp (google)
+  - 提供基于int8x8_t的计算
+    ```bash
+    int16x8_t vmlal_s8(int16x8_t a, int8x8_t b, int8x8_t c);
+    ```
+  - 计算库
+    - [gemmlowp](https://github.com/google/gemmlowp)
 
 ---
 
-# 深度学习系统中的应用
-- tensorflow
+# <small>深度学习系统中的应用</small>
+- tensorflow，[用TensorFlow压缩神经网络](http://fjdu.github.io/machine/learning/2016/07/07/quantize-neural-networks-with-tensorflow.html)
+  - 使用tensorflow提供的计算图转换工具[transform_graph](https://github.com/tensorflow/tensorflow/tree/master/tensorflow/tools/graph_transforms#eight-bit-calculations)
+    - quantized_weights
+    - quantized_nodes
+  ![80%](images/relu_origin.jpg)
 
+---
+
+# <small>深度学习系统中的应用</small>
+- tensorflow，[用TensorFlow压缩神经网络](http://fjdu.github.io/machine/learning/2016/07/07/quantize-neural-networks-with-tensorflow.html)
+  - 使用quantize相关的op
+    - QuantizeV2Op, [tensorflow/core/kernels/quantize_op.cc](https://github.com/tensorflow/tensorflow/blob/master/tensorflow/core/kernels/quantize_op.cc)
+    - DequantizeOp, [tensorflow/core/kernels/dequantize_op.h](https://github.com/tensorflow/tensorflow/blob/master/tensorflow/core/kernels/dequantize_op.h)
+    - QuantizedReluOp, [tensorflow/core/kernels/quantized_activation_ops.cc](https://github.com/tensorflow/tensorflow/blob/master/tensorflow/core/kernels/quantized_activation_ops.cc)
+  ![60%](images/relu_quantized.jpg)
 
 ---
 <!-- prerender: true -->
