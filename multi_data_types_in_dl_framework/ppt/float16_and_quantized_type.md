@@ -274,9 +274,16 @@
 
 ---
 
-# 基本类型支持
+# <small>基本类型支持</small>
 - 类型转换方法-Google
-
+  - [On the efficient representation and execution of deep acoustic models](https://arxiv.org/abs/1607.04683)
+  - 使用`QUInt8`量化，希望量化到的范围`[0, 255]`
+    $$ \tilde{V} = \frac{255}{V_{max}-V_{min}} * (V - V_{min})$$
+  - 令 $Q=\frac{255}{V_{max}-V_{min}}$，恢复
+    $$ V = \tilde{V}*Q^{-1} + V_{min}$$
+  - 作用于$Y=W*X$，可得
+  $$ Y=\tilde{W}*\tilde{X}*Q_W^{-1}*Q_X^{-1} + \tilde{W}*Q_W^{-1}*X_{min} + \tilde{X}*Q_X^{-1}*W_{min}+W_{min}*X_{min}$$
+  
 ---
 
 # 为什么更快？
