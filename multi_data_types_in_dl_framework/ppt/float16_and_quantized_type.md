@@ -122,12 +122,47 @@
 
 --- 
 
-# FP16为什么比float快？
-- 硬件支持-NVIDIA GPU
-	- 指令，intrinsic
-	- 计算库，cublas，cudnn
-- 硬件支持-ARM CPU
-	- 指令，intrinsic
+# <small>half为什么比float快？</small>
+- <small>硬件支持-NVIDIA GPU
+  - `half2`类型，两路向量半精度融合乘加指令(`HFMA2`) `a * b + c`
+  `__device__ __half2 __hfma2(const __half2 a, const __half2 b, const __half2 c)`
+  - 一条指令操作两个`half`数据
+  - [使用示例](https://github.com/parallel-forall/code-samples/blob/master/posts/mixed-precision/haxpy.cu#L50)
+  ```
+  __global__ void haxpy(int n, half a, const half *x, half *y) {
+    int start = threadIdx.x + blockDim.x * blockIdx.x;
+    int stride = blockDim.x * gridDim.x;
+  #if __CUDA_ARCH__ >= 530
+    int n2 = n/2;
+    half2 *x2 = (half2*)x, *y2 = (half2*)y;
+    for (int i = start; i < n2; i+= stride) 
+      y2[i] = __hfma2(__halves2half2(a, a), x2[i], y2[i]);
+    // first thread handles singleton for odd arrays
+    if (start == 0 && (n%2)) y[n-1] = __hfma(a, x[n-1], y[n-1]);   
+  #else
+    for (int i = start; i < n; i+= stride)
+      y[i] = __float2half(__half2float(a) * __half2float(x[i]) + __half2float(y[i]));
+  #endif
+  }
+  ```
+  </small>
+
+---
+
+# <small>half为什么比float快？</small>
+- 计算库支持-NVIDIA GPU
+  - cuBLAS
+    - `cublasHgemm`，使用FP16计算，并且作为输入输出
+    - `cublasSgemmEx`，使用FP32计算，输入数据可以是FP32、FP16或INT8，输出数据可以是FP32或FP16
+  - cuDNN
+    - 5.0支持FP16卷积前向计算，5.1支持FP16卷积后向计算
+  - 其他支持FP16 gemm的计算库：nervana，openai
+
+---
+
+# <small>half为什么比float快？</small>
+- 硬件支持-ARMV8 CPU
+  - 指令，intrinsic
 
 ---
 
