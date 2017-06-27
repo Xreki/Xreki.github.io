@@ -123,7 +123,7 @@
 --- 
 
 # <small>half为什么比float快？</small>
-- <small>硬件支持-NVIDIA GPU
+- <small>硬件支持-NVIDIA GPU, [Mixed-Precision Programming with CUDA 8](https://devblogs.nvidia.com/parallelforall/mixed-precision-programming-cuda-8/)
   - `half2`类型，两路向量半精度融合乘加指令(`HFMA2`)，一条指令操作两个`half`数据
     ```cpp
     __device__ __half2 __hfma2(const __half2 a, const __half2 b, const __half2 c); // a * b + c
@@ -289,7 +289,8 @@
 ---
 
 # <small>为什么更快？</small>
-- 硬件支持-NVIDIA GPU include/sm_61_intrinsics.h
+- 硬件支持-NVIDIA GPU， [Mixed-Precision Programming with CUDA 8](https://devblogs.nvidia.com/parallelforall/mixed-precision-programming-cuda-8/)
+  - include/sm_61_intrinsics.h
   ![70%](images/dp4a.jpg)
   - 计算函数
   ```cpp
