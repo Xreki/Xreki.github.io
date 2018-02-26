@@ -64,21 +64,22 @@
   - [ ] Consider to support other features in core (optional)
     - [ ] parallel.do
     - [ ] etc.
-- [ ] 2. Performance
+- [ ] 2. Support FP16, **@Kexin**
+  - [x] Add the basic data type
+    - [x] **[Merged]** Move float16 into fluid folder, https://github.com/PaddlePaddle/Paddle/pull/8394
+    - [x] **[Merged]** Make float16 a C++ POD class, https://github.com/PaddlePaddle/Paddle/pull/8456
+- [ ] 3. Performance
   - [ ] Benchmark of speed (paddle/platform/profiler_test.cc), compared with TensorRT
     - [ ] Survey TensorRT for inference, **@Siddharth**, https://github.com/PaddlePaddle/Paddle/issues/8492
     - [ ] recognize digits, **@Siddharth**, https://github.com/PaddlePaddle/Paddle/pull/8497
     - [ ] resnet
     - [ ] googlenet
     - [ ] etc.
-  - [ ] support FP16, **@Kexin**
-    - [x] **[Merged]** Move float16 into fluid folder, https://github.com/PaddlePaddle/Paddle/pull/8394
-    - [x] **[Merged]** Make float16 a C++ POD class, https://github.com/PaddlePaddle/Paddle/pull/8456
   - [ ] Performance optimization (online or offline tools) (optional)
     - [ ] integrated TensorRT
     - [ ] layout transformation: NCHW -> NHWC
     - [ ] merge batch normalization
     - [ ] etc.
-- [ ] 3. Memory usage
+- [ ] 4. Memory usage
   - [ ] Benchmark
   - [ ] Optimization (python/paddle/v2/fluid/memory_optimization_transpiler.py)
