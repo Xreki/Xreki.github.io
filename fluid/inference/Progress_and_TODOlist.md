@@ -1,3 +1,8 @@
+# Overview
+- Github Project：https://github.com/PaddlePaddle/Paddle/projects/28
+- Design Doc：https://github.com/PaddlePaddle/Paddle/pull/7315
+- 工作内容管理：https://docs.google.com/spreadsheets/d/10ie4tOUpXoZB6u5U3GIZd19SRONEC_IgluGIdxZy7s0/edit#gid=0
+
 # Progresses and TODOlist of inference framework
 ## Phase I
 ### 2018-02-12
