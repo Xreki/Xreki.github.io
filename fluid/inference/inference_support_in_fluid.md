@@ -14,11 +14,12 @@
 - Python Inference API
 - 编译Fluid Inference库
 - Inference C++ API
+- Inference实例
 
 ---
 
 ## Python Inference API **[正在改进中]**
-- 保存Inference模型 [:arrow_forward:](https://github.com/PaddlePaddle/Paddle/blob/develop/python/paddle/fluid/io.py#L295)
+- 保存Inference模型 [:arrow_forward:](https://github.com/PaddlePaddle/Paddle/blob/develop/python/paddle/fluid/io.py#L295)<small>
   ```python
   def save_inference_model(dirname,
                            feeded_var_names,
@@ -28,6 +29,49 @@
                            model_filename=None,
                            params_filename=None):
   ```
+  Inference模型和参数将会保存到`dirname`目录下：
+  - 序列化的模型
+    - `model_filename`为`None`，保存到`dirname/__model__`
+    - `model_filename`非`None`，保存到`dirname/model_filename`
+  - 参数
+    - `params_filename`为`None`，单独保存到各个独立的文件，各文件以参数变量的名字命名
+    - `params_filename`非`None`，保存到`dirname/params_filename`
+</small>
+
+---
+
+## Python Inference API **[正在改进中]**
+- 两种存储格式<small>
+  - 参数保存到各个独立的文件
+    - 如，设置`model_filename`为`None`、`params_filename`为`None`
+    ```bash
+    $ cd recognize_digits_conv.inference.model
+    $ ls
+    $ __model__ batch_norm_1.w_0 batch_norm_1.w_2 conv2d_2.w_0 conv2d_3.w_0 fc_1.w_0 batch_norm_1.b_0 batch_norm_1.w_1 conv2d_2.b_0 conv2d_3.b_0 fc_1.b_0
+    ```
+  - 参数保存到同一个文件
+    - 如，设置`model_filename`为`None`、`params_filename`为`__params__`
+    ```bash
+    $ cd recognize_digits_conv.inference.model
+    $ ls
+    $ __model__ __params__
+    ```
+
+</small>
+
+---
+
+## Python Inference API **[正在改进中]**
+- 加载Inference模型 [:arrow_forward:](https://github.com/PaddlePaddle/Paddle/blob/develop/python/paddle/fluid/io.py#L380)<small>
+  ```python
+  def load_inference_model(dirname,
+                           executor,
+                           model_filename=None,
+                           params_filename=None):
+    ...
+    return [program, feed_target_names, fetch_targets]
+  ```
+</small>
 
 ---
 
@@ -141,8 +185,8 @@
     // or
     auto inference_program = paddle::inference::Load(executor,
                                                      *scope,
-                                                     dirname + "/" + prog_filename,
-                                                     dirname + "/" + param_filename);
+                                                     dirname + "/" + model_filename,
+                                                     dirname + "/" + params_filename);
     ```
   </small>
 ---
@@ -159,6 +203,7 @@
     ```
   - :four: 准备`feed`数据
     ```cpp
+    #include "paddle/fluid/framework/lod_tensor.h"
     std::vector<paddle::framework::LoDTensor*> cpu_feeds;
     ...
     std::map<std::string, const paddle::framework::LoDTensor*> feed_targets;
@@ -188,8 +233,21 @@
     ```cpp
     executor.Run(*inference_program, scope, feed_targets, fetch_targets);
     ```
-    针对不同的数据，:three: - :six:可执行多次。
-  - :seven: 释放内存
+  - :seven: 使用`fetch`数据
+    ```cpp
+    for (size_t i = 0; i < cpu_fetchs.size(); ++i) {
+      std::cout << "lod_i: " << cpu_fetchs[i]->lod();
+      std::cout << "dims_i: " << cpu_fetchs[i]->dims();
+      std::cout << "result:";
+      float* output_ptr = cpu_fetchs[i]->data<float>();
+      for (int j = 0; j < cpu_fetchs[i]->numel(); ++j) {
+        std::cout << " " << output_ptr[j];
+      }
+      std::cout << std::endl;
+    }
+    ```
+    针对不同的数据，:three: - :seven:可执行多次。
+  - :eight: 释放内存
     ```cpp
     delete scope;
     ```
@@ -199,22 +257,30 @@
 ---
 
 ## C++ Inference API
-### 基本概念
-- Tensor，LoDTensor
-- Place：CPUPlace，CUDAPlace
-- Scope
-- Executor
-- 初始化函数：InitDevices
+- 基本概念<small>
+  - 数据相关：
+    - [Tensor](https://github.com/PaddlePaddle/Paddle/blob/develop/paddle/fluid/framework/tensor.md), 一个N维数组，数据可以是任意类型（int，float，double等）
+    - [LoDTensor](https://github.com/PaddlePaddle/Paddle/blob/develop/paddle/fluid/framework/lod_tensor.md), 带LoD(Level-of-Detail)即序列信息的Tensor
+    - [Scope](https://github.com/PaddlePaddle/Paddle/blob/develop/doc/design/scope.md), 记录了变量Variable
+  - 执行相关：
+    - [Executor](https://github.com/PaddlePaddle/Paddle/blob/develop/doc/design/executor.md)，无状态执行器，只跟设备相关
+    - Place
+      - CPUPlace，CPU设备
+      - CUDAPlace，CUDA GPU设备
+  - 神经网络表示：
+    - [Program](https://github.com/PaddlePaddle/Paddle/blob/develop/doc/design/program.md)
+
+  详细介绍请参考[**Paddle Fluid开发者指南**](https://github.com/lcy-seso/learning_notes/blob/master/Fluid/developer's_guid_for_Fluid/Developer's_Guide_to_Paddle_Fluid.md)
+</small>
 
 ---
 
-## C++ Inference API
+## Inference实例
 
-- 示例模型
-  - [fit a line](https://github.com/PaddlePaddle/Paddle/blob/develop/paddle/fluid/inference/tests/book/test_inference_fit_a_line.cc)
-  - [image classification](https://github.com/PaddlePaddle/Paddle/blob/develop/paddle/fluid/inference/tests/book/test_inference_image_classification.cc)
-  - [label semantic roles](https://github.com/PaddlePaddle/Paddle/blob/develop/paddle/fluid/inference/tests/book/test_inference_label_semantic_roles.cc)
-  - [recognize digits](https://github.com/PaddlePaddle/Paddle/blob/develop/paddle/fluid/inference/tests/book/test_inference_recognize_digits.cc)
-  - [recommender system](https://github.com/PaddlePaddle/Paddle/blob/develop/paddle/fluid/inference/tests/book/test_inference_recommender_system.cc)
-  - [understand sentiment](https://github.com/PaddlePaddle/Paddle/blob/develop/paddle/fluid/inference/tests/book/test_inference_understand_sentiment.cc)
-  - [word2vec](https://github.com/PaddlePaddle/Paddle/blob/develop/paddle/fluid/inference/tests/book/test_inference_word2vec.cc)
+  1. fit a line: [Python](https://github.com/PaddlePaddle/Paddle/blob/develop/python/paddle/fluid/tests/book/test_fit_a_line.py), [C++](https://github.com/PaddlePaddle/Paddle/blob/develop/paddle/fluid/inference/tests/book/test_inference_fit_a_line.cc)
+  1. image classification: [Python](https://github.com/PaddlePaddle/Paddle/blob/develop/python/paddle/fluid/tests/book/test_image_classification.py), [C++](https://github.com/PaddlePaddle/Paddle/blob/develop/paddle/fluid/inference/tests/book/test_inference_image_classification.cc)
+  1. label semantic roles: [Python](https://github.com/PaddlePaddle/Paddle/blob/develop/python/paddle/fluid/tests/book/test_label_semantic_roles.py), [C++](https://github.com/PaddlePaddle/Paddle/blob/develop/paddle/fluid/inference/tests/book/test_inference_label_semantic_roles.cc)
+  1. recognize digits: [Python](https://github.com/PaddlePaddle/Paddle/blob/develop/python/paddle/fluid/tests/book/test_recognize_digits.py), [C++](https://github.com/PaddlePaddle/Paddle/blob/develop/paddle/fluid/inference/tests/book/test_inference_recognize_digits.cc)
+  1. recommender system: [Python](https://github.com/PaddlePaddle/Paddle/blob/develop/python/paddle/fluid/tests/book/test_recommender_system.py), [C++](https://github.com/PaddlePaddle/Paddle/blob/develop/paddle/fluid/inference/tests/book/test_inference_recommender_system.cc)
+  1. understand sentiment: [Python](https://github.com/PaddlePaddle/Paddle/blob/develop/python/paddle/fluid/tests/book/test_understand_sentiment.py), [C++](https://github.com/PaddlePaddle/Paddle/blob/develop/paddle/fluid/inference/tests/book/test_inference_understand_sentiment.cc)
+  1. word2vec: [Python](https://github.com/PaddlePaddle/Paddle/blob/develop/python/paddle/fluid/tests/book/test_word2vec.py), [C++](https://github.com/PaddlePaddle/Paddle/blob/develop/paddle/fluid/inference/tests/book/test_inference_word2vec.cc)
