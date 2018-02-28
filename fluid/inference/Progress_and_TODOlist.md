@@ -40,24 +40,26 @@
   - [x] **[Merged]** make inference_lib_dist for fluid inference shared library: https://github.com/PaddlePaddle/Paddle/pull/7977
   - [x] **[Merged]** refine inference_lib_dist after code move, and add it to docker/build.sh, https://github.com/PaddlePaddle/Paddle/pull/8379
 - [ ] 11. Compile fluid to a static library, **@luotao**
-  - [x] compile and install the static library of fluid inference: https://github.com/PaddlePaddle/Paddle/pull/7827
+  - [ ] compile and install the static library of fluid inference: https://github.com/PaddlePaddle/Paddle/pull/7827
   - [x] **[Merged]** Add `make clean` in docker/build.sh, https://github.com/PaddlePaddle/Paddle/pull/8076
 - [ ] 12. Basic usage
   - [x] **[Merged]** simplify the codes and cmake, **@Yiqun**, https://github.com/PaddlePaddle/Paddle/pull/8216
   - [x] **[Merged]** Simplify the cmake of inference, **@Yiqun**, https://github.com/PaddlePaddle/Paddle/pull/8272
   - [x] **[Merged]** Fix GCC warnings comparing signed/unsigned, **@Siddharth**,  https://github.com/PaddlePaddle/Paddle/pull/8346
   - [x] **[Merged]** Fix include path in inference test codes, **@Kexin**, https://github.com/PaddlePaddle/Paddle/pull/8349
-  - [ ] Refine the inferene API and unittests, **@Yiqun**, https://github.com/PaddlePaddle/Paddle/pull/8404
+  - [x] **[Merged]** Refine the inferene API and unittests, **@Yiqun**, https://github.com/PaddlePaddle/Paddle/pull/8404
 
 <font color=#DC143C>红色</font>
 
 ## Phase II
-### 2018-02-26
+### 2018-02-28
 - [ ] 1. Improve the current implementation
   - [ ] Implement another `Load(...)`, loading from buffer, **@Siddharth**
     - [ ] Add buffer option for load_combine_op, https://github.com/PaddlePaddle/Paddle/pull/8259
+  - [ ] Compile fluid to a static library, **@luotao**
+    - [x] <font color=#DC143C>**[Merged]** combine batch_size_like.cc into batch_size_like.h, https://github.com/PaddlePaddle/Paddle/pull/8604</font>
   - [ ] Improve the Python and C++ API, make them easy to use
-    - [ ] Need to change the attribute `is_test` of `batch_norm_op` to `true` in `test_program` and `inference_program`, https://github.com/PaddlePaddle/Paddle/issues/8372
+    - [ ] <font color=#DC143C>Enable is_test attr of batch_norm and drop_out op for test program</font>, **@Kexin**,  https://github.com/PaddlePaddle/Paddle/pull/8642
     - [ ] Add useful debugging information in load() in inference API, https://github.com/PaddlePaddle/Paddle/issues/8452
     - [ ] Revise selected unit-tests for inference, https://github.com/PaddlePaddle/Paddle/issues/8491
   - [ ] Example of multi-threads sharing one ProgramDesc
@@ -68,6 +70,7 @@
   - [x] Add the basic data type
     - [x] **[Merged]** Move float16 into fluid folder, https://github.com/PaddlePaddle/Paddle/pull/8394
     - [x] **[Merged]** Make float16 a C++ POD class, https://github.com/PaddlePaddle/Paddle/pull/8456
+    - [ ] <font color=#DC143C>Integrate float16 into data_type_transform</font>, https://github.com/PaddlePaddle/Paddle/pull/8619
 - [ ] 3. Performance
   - [ ] Benchmark of speed (paddle/platform/profiler_test.cc), compared with TensorRT
     - [ ] Survey TensorRT for inference, **@Siddharth**, https://github.com/PaddlePaddle/Paddle/issues/8492
@@ -83,3 +86,5 @@
 - [ ] 4. Memory usage
   - [ ] Benchmark
   - [ ] Optimization (python/paddle/v2/fluid/memory_optimization_transpiler.py)
+- [ ] 5. Documentation
+  - [x] <font color=#DC143C>A basic userguide of Fluid inference</font>, **@Yiqun**, https://github.com/Xreki/Xreki.github.io/blob/master/fluid/inference/inference_support_in_fluid.md
