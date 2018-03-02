@@ -49,32 +49,32 @@
   - [x] **[Merged]** Fix include path in inference test codes, **@Kexin**, https://github.com/PaddlePaddle/Paddle/pull/8349
   - [x] **[Merged]** Refine the inferene API and unittests, **@Yiqun**, https://github.com/PaddlePaddle/Paddle/pull/8404
 
-<font color=#DC143C>红色</font>
-
 ## Phase II
-### 2018-02-28
+### 2018-03-02
 - [ ] 1. Improve the current implementation
   - [ ] Implement another `Load(...)`, loading from buffer, **@Siddharth**
     - [ ] Add buffer option for load_combine_op, https://github.com/PaddlePaddle/Paddle/pull/8259
   - [ ] Compile fluid to a static library, **@luotao**
-    - [x] <font color=#DC143C>**[Merged]** combine batch_size_like.cc into batch_size_like.h, https://github.com/PaddlePaddle/Paddle/pull/8604</font>
+    - [x] **[Merged]** combine batch_size_like.cc into batch_size_like.h, https://github.com/PaddlePaddle/Paddle/pull/8604
+    - [ ] <font color=red>refine operators/math/CMakeLists.txt</font>, https://github.com/PaddlePaddle/Paddle/pull/8682
   - [ ] Improve the Python and C++ API, make them easy to use
-    - [ ] <font color=#DC143C>Enable is_test attr of batch_norm and drop_out op for test program</font>, **@Kexin**,  https://github.com/PaddlePaddle/Paddle/pull/8642
+    - [ ] Enable is_test attr of batch_norm and drop_out op for test program, **@Kexin**,  https://github.com/PaddlePaddle/Paddle/pull/8642
     - [ ] Add useful debugging information in load() in inference API, https://github.com/PaddlePaddle/Paddle/issues/8452
     - [ ] Revise selected unit-tests for inference, https://github.com/PaddlePaddle/Paddle/issues/8491
   - [ ] Example of multi-threads sharing one ProgramDesc
   - [ ] Consider to support other features in core (optional)
     - [ ] parallel.do
     - [ ] etc.
-- [ ] 2. Support FP16, **@Kexin**
+- [ ] 2. Support FP16, **@Kexin**, https://github.com/PaddlePaddle/Paddle/issues/8693
   - [x] Add the basic data type
     - [x] **[Merged]** Move float16 into fluid folder, https://github.com/PaddlePaddle/Paddle/pull/8394
     - [x] **[Merged]** Make float16 a C++ POD class, https://github.com/PaddlePaddle/Paddle/pull/8456
-    - [ ] <font color=#DC143C>Integrate float16 into data_type_transform</font>, https://github.com/PaddlePaddle/Paddle/pull/8619
+    - [ ] Integrate float16 into data_type_transform, https://github.com/PaddlePaddle/Paddle/pull/
+    - [ ] <font color=red>Add float16 GEMM math function on GPU</font>, https://github.com/PaddlePaddle/Paddle/pull/8695
 - [ ] 3. Performance
-  - [ ] Benchmark of speed (paddle/platform/profiler_test.cc), compared with TensorRT
+  - [ ] Benchmark of speed (paddle/platform/profiler_test.cc), compared with TensorRT, https://github.com/PaddlePaddle/Paddle/issues/8671
     - [ ] Survey TensorRT for inference, **@Siddharth**, https://github.com/PaddlePaddle/Paddle/issues/8492
-    - [ ] recognize digits, **@Siddharth**, https://github.com/PaddlePaddle/Paddle/pull/8497
+    - [ ] recognize digits, **@Siddharth**, https://github.com/PaddlePaddle/Paddle/pull/8497 ; <font color=red>results</font>,  https://github.com/sidgoyal78/paddle_notes/blob/master/benchmark/recoginze_digits.md
     - [ ] resnet
     - [ ] googlenet
     - [ ] etc.
@@ -87,4 +87,4 @@
   - [ ] Benchmark
   - [ ] Optimization (python/paddle/v2/fluid/memory_optimization_transpiler.py)
 - [ ] 5. Documentation
-  - [x] <font color=#DC143C>A basic userguide of Fluid inference</font>, **@Yiqun**, https://github.com/Xreki/Xreki.github.io/blob/master/fluid/inference/inference_support_in_fluid.md
+  - [x] A basic userguide of Fluid inference, **@Yiqun**, https://github.com/Xreki/Xreki.github.io/blob/master/fluid/inference/inference_support_in_fluid.md
