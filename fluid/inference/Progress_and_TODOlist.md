@@ -50,7 +50,7 @@
   - [x] **[Merged]** Refine the inferene API and unittests, **@Yiqun**, https://github.com/PaddlePaddle/Paddle/pull/8404
 
 ## Phase II
-### 2018-03-02
+### 2018-03-05
 - [ ] 1. Improve the current implementation
   - [ ] Implement another `Load(...)`, loading from buffer, **@Siddharth**
     - [ ] Add buffer option for load_combine_op, https://github.com/PaddlePaddle/Paddle/pull/8259
@@ -75,6 +75,7 @@
   - [ ] Benchmark of speed (paddle/platform/profiler_test.cc), compared with TensorRT, https://github.com/PaddlePaddle/Paddle/issues/8671
     - [ ] Survey TensorRT for inference, **@Siddharth**, https://github.com/PaddlePaddle/Paddle/issues/8492
     - [ ] recognize digits, **@Siddharth**, https://github.com/PaddlePaddle/Paddle/pull/8497 ; <font color=red>results</font>,  https://github.com/sidgoyal78/paddle_notes/blob/master/benchmark/recoginze_digits.md
+    - [ ] <font color=red>Add profiling information for inference example recognize digits</font>, **@Yiqun**,  https://github.com/PaddlePaddle/Paddle/pull/8748
     - [ ] resnet
     - [ ] googlenet
     - [ ] etc.
