@@ -40,7 +40,6 @@
   - [x] **[Merged]** make inference_lib_dist for fluid inference shared library: https://github.com/PaddlePaddle/Paddle/pull/7977
   - [x] **[Merged]** refine inference_lib_dist after code move, and add it to docker/build.sh, https://github.com/PaddlePaddle/Paddle/pull/8379
 - [ ] 11. Compile fluid to a static library, **@luotao**
-  - [ ] compile and install the static library of fluid inference: https://github.com/PaddlePaddle/Paddle/pull/7827
   - [x] **[Merged]** Add `make clean` in docker/build.sh, https://github.com/PaddlePaddle/Paddle/pull/8076
 - [ ] 12. Basic usage
   - [x] **[Merged]** simplify the codes and cmake, **@Yiqun**, https://github.com/PaddlePaddle/Paddle/pull/8216
@@ -50,15 +49,16 @@
   - [x] **[Merged]** Refine the inferene API and unittests, **@Yiqun**, https://github.com/PaddlePaddle/Paddle/pull/8404
 
 ## Phase II
-### 2018-03-05
+### 2018-03-07
 - [ ] 1. Improve the current implementation
   - [ ] Implement another `Load(...)`, loading from buffer, **@Siddharth**
     - [ ] Add buffer option for load_combine_op, https://github.com/PaddlePaddle/Paddle/pull/8259
   - [ ] Compile fluid to a static library, **@luotao**
     - [x] **[Merged]** combine batch_size_like.cc into batch_size_like.h, https://github.com/PaddlePaddle/Paddle/pull/8604
-    - [ ] <font color=red>refine operators/math/CMakeLists.txt</font>, https://github.com/PaddlePaddle/Paddle/pull/8682
+    - [x] <font color=red>**[Merged]**</font> refine operators/math/CMakeLists.txt, https://github.com/PaddlePaddle/Paddle/pull/8682
+    - [ ] compile and install the static library of fluid inference: https://github.com/PaddlePaddle/Paddle/pull/7827
   - [ ] Improve the Python and C++ API, make them easy to use
-    - [ ] Enable is_test attr of batch_norm and drop_out op for test program, **@Kexin**,  https://github.com/PaddlePaddle/Paddle/pull/8642
+    - [x] <font color=red>**[Merged]**</font> Enable is_test attr of batch_norm and drop_out op for test program, **@Kexin**,  https://github.com/PaddlePaddle/Paddle/pull/8642
     - [ ] Add useful debugging information in load() in inference API, https://github.com/PaddlePaddle/Paddle/issues/8452
     - [ ] Revise selected unit-tests for inference, https://github.com/PaddlePaddle/Paddle/issues/8491
   - [ ] Example of multi-threads sharing one ProgramDesc
@@ -69,13 +69,14 @@
   - [x] Add the basic data type
     - [x] **[Merged]** Move float16 into fluid folder, https://github.com/PaddlePaddle/Paddle/pull/8394
     - [x] **[Merged]** Make float16 a C++ POD class, https://github.com/PaddlePaddle/Paddle/pull/8456
-    - [ ] Integrate float16 into data_type_transform, https://github.com/PaddlePaddle/Paddle/pull/
-    - [ ] <font color=red>Add float16 GEMM math function on GPU</font>, https://github.com/PaddlePaddle/Paddle/pull/8695
+    - [x] <font color=red>**[Merged]**</font> Integrate float16 into data_type_transform, https://github.com/PaddlePaddle/Paddle/pull/
+    - [ ] Add float16 GEMM math function on GPU, https://github.com/PaddlePaddle/Paddle/pull/8695
+    - [ ] <font color=red>Add fp16 support for Mul Op</font>, https://github.com/PaddlePaddle/Paddle/pull/8817
 - [ ] 3. Performance
   - [ ] Benchmark of speed (paddle/platform/profiler_test.cc), compared with TensorRT, https://github.com/PaddlePaddle/Paddle/issues/8671
     - [ ] Survey TensorRT for inference, **@Siddharth**, https://github.com/PaddlePaddle/Paddle/issues/8492
-    - [ ] recognize digits, **@Siddharth**, https://github.com/PaddlePaddle/Paddle/pull/8497 ; <font color=red>results</font>,  https://github.com/sidgoyal78/paddle_notes/blob/master/benchmark/recoginze_digits.md
-    - [ ] <font color=red>Add profiling information for inference example recognize digits</font>, **@Yiqun**,  https://github.com/PaddlePaddle/Paddle/pull/8748
+    - [ ] recognize digits, **@Siddharth**, https://github.com/PaddlePaddle/Paddle/pull/8497 ; results,  https://github.com/sidgoyal78/paddle_notes/blob/master/benchmark/recoginze_digits.md
+    - [ ] Add profiling information for inference example, **@Yiqun**,  https://github.com/PaddlePaddle/Paddle/pull/8748
     - [ ] resnet
     - [ ] googlenet
     - [ ] etc.
