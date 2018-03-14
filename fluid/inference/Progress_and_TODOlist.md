@@ -49,38 +49,38 @@
   - [x] **[Merged]** Refine the inferene API and unittests, **@Yiqun**, https://github.com/PaddlePaddle/Paddle/pull/8404
 
 ## Phase II
-### 2018-03-07
+### 2018-03-14
 - [ ] 1. Improve the current implementation
   - [ ] Implement another `Load(...)`, loading from buffer, **@Siddharth**
     - [ ] Add buffer option for load_combine_op, https://github.com/PaddlePaddle/Paddle/pull/8259
-  - [ ] Compile fluid to a static library, **@luotao**
+  - [ ] Compile fluid library, **@luotao**
     - [x] **[Merged]** combine batch_size_like.cc into batch_size_like.h, https://github.com/PaddlePaddle/Paddle/pull/8604
-    - [x] <font color=red>**[Merged]**</font> refine operators/math/CMakeLists.txt, https://github.com/PaddlePaddle/Paddle/pull/8682
-    - [ ] compile and install the static library of fluid inference: https://github.com/PaddlePaddle/Paddle/pull/7827
+    - [x] **[Merged]** refine operators/math/CMakeLists.txt, https://github.com/PaddlePaddle/Paddle/pull/8682
+    - [x] <font color=red>**[Merged]**</font> compile and install the static library of fluid inference: https://github.com/PaddlePaddle/Paddle/pull/7827
+    - [ ] <font color=red>Limit the symbol table of fluid shared lbrary</font>, **@Yiqun**, https://github.com/PaddlePaddle/Paddle/pull/9065
   - [ ] Improve the Python and C++ API, make them easy to use
-    - [x] <font color=red>**[Merged]**</font> Enable is_test attr of batch_norm and drop_out op for test program, **@Kexin**,  https://github.com/PaddlePaddle/Paddle/pull/8642
+    - [x] **[Merged]** Enable is_test attr of batch_norm and drop_out op for test program, **@Kexin**,  https://github.com/PaddlePaddle/Paddle/pull/8642
     - [ ] Add useful debugging information in load() in inference API, https://github.com/PaddlePaddle/Paddle/issues/8452
     - [ ] Revise selected unit-tests for inference, https://github.com/PaddlePaddle/Paddle/issues/8491
   - [ ] Example of multi-threads sharing one ProgramDesc
   - [ ] Consider to support other features in core (optional)
-    - [ ] parallel.do
-    - [ ] etc.
 - [ ] 2. Support FP16, **@Kexin**, https://github.com/PaddlePaddle/Paddle/issues/8693
   - [x] Add the basic data type
     - [x] **[Merged]** Move float16 into fluid folder, https://github.com/PaddlePaddle/Paddle/pull/8394
     - [x] **[Merged]** Make float16 a C++ POD class, https://github.com/PaddlePaddle/Paddle/pull/8456
-    - [x] <font color=red>**[Merged]**</font> Integrate float16 into data_type_transform, https://github.com/PaddlePaddle/Paddle/pull/
-    - [ ] Add float16 GEMM math function on GPU, https://github.com/PaddlePaddle/Paddle/pull/8695
-    - [ ] <font color=red>Add fp16 support for Mul Op</font>, https://github.com/PaddlePaddle/Paddle/pull/8817
+    - [x] **[Merged]** Integrate float16 into data_type_transform, https://github.com/PaddlePaddle/Paddle/pull/
+    - [x] <font color=red>**[Merged]**</font> Add float16 GEMM math function on GPU, https://github.com/PaddlePaddle/Paddle/pull/8695
+    - [x] <font color=red>**[Merged]** Add context wait in data_type_transform</font>, https://github.com/PaddlePaddle/Paddle/pull/8850
+    - [x] <font color=red>**[Merged]** Add GPU compute capability check for float16 math function test</font>, https://github.com/PaddlePaddle/Paddle/pull/8946
+    - [ ] <font color=red>Add fp16 Mul Op support and bind paddle fp16 to numpy fp16</font>, https://github.com/PaddlePaddle/Paddle/pull/9043
 - [ ] 3. Performance
   - [ ] Benchmark of speed (paddle/platform/profiler_test.cc), compared with TensorRT, https://github.com/PaddlePaddle/Paddle/issues/8671
     - [ ] Survey TensorRT for inference, **@Siddharth**, https://github.com/PaddlePaddle/Paddle/issues/8492
     - [ ] recognize digits, **@Siddharth**, https://github.com/PaddlePaddle/Paddle/pull/8497 ; results,  https://github.com/sidgoyal78/paddle_notes/blob/master/benchmark/recoginze_digits.md
-    - [ ] Add profiling information for inference example, **@Yiqun**,  https://github.com/PaddlePaddle/Paddle/pull/8748
-    - [ ] resnet
-    - [ ] googlenet
-    - [ ] etc.
+    - [x] <font color=red>**[Merged]**</font> Add profiling information for inference example, **@Yiqun**,  https://github.com/PaddlePaddle/Paddle/pull/
+    - [x] <font color=red>**Merged** Refine the profile codes for inference</font>, **@Yiqun**, https://github.com/PaddlePaddle/Paddle/pull/8910
   - [ ] Performance optimization (online or offline tools) (optional)
+    - [ ] <font color=red>Remove unnecessary clone of program in C++ Executor.Run</font>, **@Yiqun**, https://github.com/PaddlePaddle/Paddle/pull/9043
     - [ ] integrated TensorRT
     - [ ] layout transformation: NCHW -> NHWC
     - [ ] merge batch normalization
