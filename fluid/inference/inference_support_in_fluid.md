@@ -139,13 +139,13 @@
   <small>
   - GCC配置
     ```bash
-    $ g++ -o a.out main.cc \
+    $ g++ -o a.out -std=c++11 main.cc \
           -I${PADDLE_ROOT}/ \
           -I${PADDLE_ROOT}/third_party/install/gflags/include \
           -I${PADDLE_ROOT}/third_party/install/glog/include \
           -I${PADDLE_ROOT}/third_party/install/protobuf/include \
           -I${PADDLE_ROOT}/third_party/eigen3 \
-          -L{PADDLE_ROOT}/paddle/fluid/inference -lpaddle_fluid \
+          -L${PADDLE_ROOT}/paddle/fluid/inference -lpaddle_fluid \
           -lrt -ldl -lpthread
     ```
   - CMake配置
@@ -159,6 +159,7 @@
                           ${PADDLE_ROOT}/paddle/fluid/inference/libpaddle_fluid.so
                           -lrt -ldl -lpthread)
     ```
+  - 设置环境变量：`export LD_LIBRARY_PATH=${PADDLE_ROOT}/paddle/fluid/inference:$LD_LIBRARY_PATH`
   </small>
 
 ---
@@ -229,7 +230,7 @@
 - 推断流程  [:arrow_forward:](https://github.com/PaddlePaddle/Paddle/blob/develop/paddle/fluid/inference/tests/test_helper.h#L91)
   <small>
 
-  - :six: 执行
+  - :six: 执行`inference_program`
     ```cpp
     executor.Run(*inference_program, scope, feed_targets, fetch_targets);
     ```
@@ -257,18 +258,105 @@
 ---
 
 ## C++ Inference API
+- 接口说明<small>
+
+  ```cpp
+  void Run(const ProgramDesc& program, Scope* scope,
+           std::map<std::string, const LoDTensor*>& feed_targets,
+           std::map<std::string, LoDTensor*>& fetch_targets,
+           bool create_vars = true,
+           const std::string& feed_holder_name = "feed",
+           const std::string& fetch_holder_name = "fetch");
+  ```
+  - 使用Python API `save_inference_model`保存的`program`里面包含了`feed_op`和`fetch_op`，用户提供的`feed_targets`、`fetch_targets`必须和`inference_program`中的`feed_op`、`fetch_op`保持一致。
+  - 默认情况下，除了`persistable`属性设置为`True`的`Variable`之外，每次执行`executor.Run`会创建一个局部`Scope`，并且在这个局部`Scope`中创建和销毁所有的`Variable`，以最小化空闲时的内存占用。
+  - `persistable`属性为`True`的`Variable`有：
+    - Operators的参数`w`、`b`等
+    - `feed_op`的输入变量
+    - `fetch_op`的输出变量
+</small>
+
+---
+
+## C++ Inference API
+- **不在每次执行时创建和销毁变量 [PR](https://github.com/PaddlePaddle/Paddle/pull/9301)**<small>
+  - :six: 执行`inference_program`
+    ```cpp
+    // Call once
+    executor.CreateVariables(*inference_program, scope, 0);
+    // Call as many times as you like
+    executor.Run(
+        *inference_program, scope, feed_targets, fetch_targets, false);
+    ```
+  - 优势
+    - 节省了频繁创建、销毁变量的时间（约占每次`Run`总时间的1% ~ 12%）
+    - 执行结束后可获取所有Operators的计算结果
+  - 劣势
+    - 空闲时也会占用大量的内存
+    - 在同一个`Scope`中，相同的变量名是公用同一块内存的，容易引起意想不到的错误
+
+</small>
+
+---
+
+## C++ Inference API
+- **不在每次执行时创建Op [PR](https://github.com/PaddlePaddle/Paddle/pull/9630)**<small>
+  - :six: 执行`inference_program`
+    ```cpp
+    // Call once
+    auto ctx = executor.Prepare(*inference_program, 0);
+    // Call as many times as you like if you have no need to change the inference_program
+    executor.RunPreparedContext(ctx.get(), scope, feed_targets, fetch_targets);
+    ```
+  - 优势
+    - 节省了频繁创建、销毁Op的时间
+  - 劣势
+    - 一旦修改了`inference_program`，则需要重新创建`ctx`
+</small>
+
+---
+
+## C++ Inference API
+- **多线程共享Parameters [PR](https://github.com/PaddlePaddle/Paddle/pull/9302)**<small><small>
+  - 主线程
+    - :zero: 初始化设备
+    - :one: 定义place，executor，scope
+    - :two: 加载模型，得到`inference_program`
+  - 从线程
+    - 复制`inference_program`得到`copy_program`，修改`copy_program`的`feed_holder_name`和`fetch_holder_name`
+      ```cpp
+      auto copy_program = std::unique_ptr<paddle::framework::ProgramDesc>(
+                 new paddle::framework::ProgramDesc(*inference_program));
+      std::string feed_holder_name = "feed_" + paddle::string::to_string(thread_id);
+      std::string fetch_holder_name = "fetch_" + paddle::string::to_string(thread_id);
+      copy_program->SetFeedHolderName(feed_holder_name);
+      copy_program->SetFetchHolderName(fetch_holder_name);
+      ```
+    - :three: 获取`copy_program`的`feed_target_names`和`fetch_target_names`
+    - :four: 准备feed数据
+    - :five: 定义Tensor来fetch结果
+    - :six: 执行`copy_program`
+    - :seven: 使用fetch数据
+  - 主线程
+    - :eight: 释放资源
+    
+</small></small>
+
+---
+
+## C++ Inference API
 - 基本概念<small>
   - 数据相关：
-    - [Tensor](https://github.com/PaddlePaddle/Paddle/blob/develop/paddle/fluid/framework/tensor.md), 一个N维数组，数据可以是任意类型（int，float，double等）
-    - [LoDTensor](https://github.com/PaddlePaddle/Paddle/blob/develop/paddle/fluid/framework/lod_tensor.md), 带LoD(Level-of-Detail)即序列信息的Tensor
-    - [Scope](https://github.com/PaddlePaddle/Paddle/blob/develop/doc/design/scope.md), 记录了变量Variable
+    - [Tensor](https://github.com/PaddlePaddle/Paddle/blob/develop/doc/fluid/design/concepts/tensor.md)，一个N维数组，数据可以是任意类型（int，float，double等）
+    - [LoDTensor](https://github.com/PaddlePaddle/Paddle/blob/develop/doc/fluid/design/concepts/lod_tensor.md)，带LoD(Level-of-Detail)即序列信息的Tensor
+    - [Scope](https://github.com/PaddlePaddle/Paddle/blob/develop/doc/design/scope.md)，记录了变量Variable
   - 执行相关：
-    - [Executor](https://github.com/PaddlePaddle/Paddle/blob/develop/doc/design/executor.md)，无状态执行器，只跟设备相关
+    - [Executor](https://github.com/PaddlePaddle/Paddle/blob/develop/doc/fluid/design/concepts/executor.md)，无状态执行器，只跟设备相关
     - Place
       - CPUPlace，CPU设备
       - CUDAPlace，CUDA GPU设备
   - 神经网络表示：
-    - [Program](https://github.com/PaddlePaddle/Paddle/blob/develop/doc/design/program.md)
+    - [Program](https://github.com/PaddlePaddle/Paddle/blob/develop/doc/fluid/design/concepts/program.md)
 
   详细介绍请参考[**Paddle Fluid开发者指南**](https://github.com/lcy-seso/learning_notes/blob/master/Fluid/developer's_guid_for_Fluid/Developer's_Guide_to_Paddle_Fluid.md)
 </small>
@@ -284,3 +372,11 @@
   1. recommender system: [Python](https://github.com/PaddlePaddle/Paddle/blob/develop/python/paddle/fluid/tests/book/test_recommender_system.py), [C++](https://github.com/PaddlePaddle/Paddle/blob/develop/paddle/fluid/inference/tests/book/test_inference_recommender_system.cc)
   1. understand sentiment: [Python](https://github.com/PaddlePaddle/Paddle/blob/develop/python/paddle/fluid/tests/book/test_understand_sentiment.py), [C++](https://github.com/PaddlePaddle/Paddle/blob/develop/paddle/fluid/inference/tests/book/test_inference_understand_sentiment.cc)
   1. word2vec: [Python](https://github.com/PaddlePaddle/Paddle/blob/develop/python/paddle/fluid/tests/book/test_word2vec.py), [C++](https://github.com/PaddlePaddle/Paddle/blob/develop/paddle/fluid/inference/tests/book/test_inference_word2vec.cc)
+
+---
+
+## Inference计算优化
+
+---
+
+## 内存使用优化
