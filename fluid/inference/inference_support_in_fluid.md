@@ -15,6 +15,7 @@
 - 编译Fluid Inference库
 - Inference C++ API
 - Inference实例
+- Inference计算优化
 
 ---
 
@@ -378,12 +379,35 @@
 
 ---
 
-## Inference计算优化
+## Inference计算优化<small>
+- 使用Python推理优化工具[inference_transpiler](https://github.com/PaddlePaddle/Paddle/blob/develop/python/paddle/fluid/inference_transpiler.py)
+  ```python
+  class InferenceTranspiler:
+    def transpile(self, program, place, scope=None):
+        ...
+        if scope is None:
+            scope = global_scope()
+        ...
+  ```
+  - 使用`InferenceTranspiler`将会直接修改`program`。
+  - 使用`InferenceTranspiler`会修改参数的值，请确保`program`的参数在`scope`内。
+- 支持的优化
+  - 融合batch_norm op的计算
+- [使用示例](https://github.com/Xreki/Xreki.github.io/blob/master/fluid/inference/inference_transpiler.py)
+  ```python
+  import paddle.fluid as fluid
+  # NOTE: Applying the inference transpiler will change the inference_program.
+  t = fluid.InferenceTranspiler()
+  t.transpile(inference_program, place, inference_scope)
+  ```
+
+</small>
 
 ---
 
-## 内存使用优化
+## 内存使用优化<small>
 - 使用Python内存优化工具[memory_optimization_transipiler](https://github.com/PaddlePaddle/Paddle/blob/develop/python/paddle/fluid/memory_optimization_transpiler.py)
   ```python
   fluid.memory_optimize(inference_program)
   ```
+</small>

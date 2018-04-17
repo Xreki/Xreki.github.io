@@ -17,7 +17,8 @@ def Transpile(src_dir, dst_dir, model_filename, params_filename):
         inference_transpiler_program = inference_program.clone()
         # NOTE: Applying the inference transpiler will change the inference_transpiler_program.
         t = fluid.InferenceTranspiler()
-        t.transpile(inference_transpiler_program, inference_scope, place)
+        # Under the with statement, inference_scope is the global scope.
+        t.transpile(inference_transpiler_program, place)
 
         #print inference_transpiler_program
 
